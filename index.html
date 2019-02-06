@@ -90,41 +90,13 @@ to present why Fonto works like it works.</p></code></pre>
 		  </section>
         </section>
 
-		<section id="cur">
-		  <h2>Flow properties</h2>
-		  <ul>
-			<li>Splittable<ul><li>Can we split this element?</li></ul></li>
-			<li>Closed<ul><li>Can we move our cursor out of this element?</li></ul></li>
-			<li>Detached<ul><li>Is this element actually 'here'?</li></ul></li>
-		  </ul>
-		</section>
-	  <section>
-		<h2>Blueprints</h2>
-		<p>To allow us to 'try' out these changes, and revert them if they were bad</p>
-		<pre><code style="font-size: .75em; line-height:1.25em" class="js">const blueprint = new Blueprint();
-
-const newElement = document.createElement('newElement');
-blueprint.appendChild(newParent, newElement);
-const newParent = blueprint.getParentNode(newElement);
-// newParent is now set the documentElement node.
-
-const isValid = validator.isValidNode(blueprint, newParent);
-// The validator is passed the blueprint so it can see
-// whether the new structure is valid
-
-if (isValid) {
-  // We know it's valid, so we can safely apply these changes to the DOM
-  blueprint.realize();
-}</code></pre>
-	  </section
->
 		<section>
 		  <section>
 			<h2>Smart commands</h2>
 			<p>Use schema knowledge to compute actions</p>
 		  </section>
 		  <section>
-			<h2>(Vertical) insert node</h2>
+			<h2>(Vertically) insert node</h2>
 			<p>Insert an image, somewhere 'here'</p>
 			<ol>
 			  <li>Try to insert at the cursor</li>
@@ -187,24 +159,106 @@ if (isValid) {
 				</aside>
 		  </section>
 		</section>
-	  <section>
-		<h2>Schema knowledge</h2>
-		<p>Splitting a Section with a required title</p>
-		<div style="position: relative">
-	  <div style="position: absolute;" class="fragment fade-in stretch">
-		<pre><code class="hljs xml"><section>
-			  <title></title>
-			</section></code></pre>
-	  </section>
-	  <section>
-		<h2>Next steps</h2>
-		<ul>
-		  <li>XQuery</li>
-		  <li>XQuery Update Facility</li>
-		</ul>
-	  </section>
-	  <section><h2>Questions</h2></section>
-    </div>
+		<section>
+		  <h2>Composable mutations</h2>
+		  <ul>
+			<li>
+			  Insert a node vertically</li>
+			<li class="fragment">, OR append if it can't be
+			</li>
+			<li class="fragment">
+			  Overlays
+			</li>
+		  </ul>
+		  <aside class="notes" data-markdown>
+			* We combine the mutations like Vertical Insert with other
+		  mutations, like Horizontal Insert, ensuring a node is
+		  present somewhere, etc.
+			* For this, we extended our blueprints to allow overlaying
+			* This allows us to 'discard' changes if they were bad
+		  </aside>
+		</section>
+		<section>
+		  <h2>Operations</h2>
+		  <pre><code class="json">{
+  "insert-image": {
+    "steps": [
+      { "type": "modal/open-image-browser" },
+      {
+        "type": "command/insert-node",
+        "data": {
+          "childNodeStructure": [
+            "img", { "src": "{{href}}" ]
+          ]
+        }
+      }
+    ]
+  }
+}</code></pre>
+		  <aside class="notes">These composable mutations can be composed in operations, which also do UI</aside>
+		</section>
+		<section id="cur">
+		  <h2>Flow properties</h2>
+		  <p>More abstract commands</p>
+		  <ul>
+			<li>Splittable<ul><li>Can we split this element?</li></ul></li>
+			<li>Closed<ul><li>Can we move our cursor out of this element?</li></ul></li>
+			<li>Detached<ul><li>Is this element actually 'here'?</li></ul></li>
+		  </ul>
+		  <aside class="notes" data-markdown>
+			* E-mail addresses are unsplittable
+			* Footnotes are closed
+			* Metadata elements are not really 'there'
+		  </aside>
+		</section>
+		<section>
+		  <h2>JS-based selectors</h2>
+		  <pre class="fragment"><code class="js">matchNodeName("emphasis").withAttribute("type", "bold")</code></pre>
+		  <pre class="fragment"><code class="js">matchNodeName("emphasis")
+  .withAttribute("type", "bold")
+  .requireNodePredicate(
+    (node, blueprint) =>
+       matchNodeName("someElement")(blueprint.getParentNode(node).nodeName === "someElement")</code></pre>
+		  <aside class="notes">We needed a way to relate these flow properties with nodes, so we made a fluent API, heavily inspired by CSS</aside>
+		</section>
+		<section>
+		  <h2>Deep schema knowledge</h2>
+		  <p>Splitting a Section with a required title</p>
+		  <pre><code class="hljs xml">&lt;section&gt;
+  &lt;title&gt;&lt;/title&gt;
+&lt;/section&gt;</code></pre>
+		  <aside class="note">Another concept that proved to be useful is to leverage schema knowledge</aside>
+		</section>
+		<section>
+		  <h2>Next steps</h2>
+		  <p>XQuery / Update Facility</p>
+		  <ul>
+			<li>Open questions:</li>
+			<li>Blueprints / Overlays</li>
+			<li>Incoorporate UI (Do we want to?)</li>
+		  </ul>
+		  <aside class="notes" data-markdown>
+			* We are working to have more XQuery APIs in Fonto.
+			* They are better knwon,
+			* larger community (than our Fonto APIs),
+			* are more consise
+
+			But we are running into questions:
+
+			* How to keep our Blueprints / composability
+		  </aside>
+		</section>
+		<section>
+		  <h2>Take-aways</h2>
+		  <ul>
+			<li>A lot of XML tools are missing in JavaScript</li>
+			<li class="fragment">So build your own</li>
+			<li>Building your own APIs is fast</li>
+			<li class="fragment">But standards are better</li>
+		  </ul>
+		</section>
+		<section><h2>Questions</h2></section>
+      </div>
 
     <script src="lib/js/head.min.js"></script>
     <script src="js/reveal.js"></script>
