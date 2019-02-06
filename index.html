@@ -34,7 +34,7 @@
           <h1>How to configure an editor</h1>
           <p>
             Martin Middel <br />
-            <a href="http://www.fontoxml.com">FontoXML.com</a>
+            <a href="http://www.fontoxml.com">FontoXML</a>
           </p>
         </section>
 
@@ -47,15 +47,18 @@
 			  </ul>
 			</aside>
 		  </section>
-          <section id="cur">
-            <h2>Schema-agnostic</h2>
+          <section>
+            <h2>Schemata</h2>
             <ul>
-              <li>Most are 'like HTML', but different names</li>
+              <li>
+				<p>Most are 'like HTML', but different names</p>
+				<pre><code class="hljs xml">&lt;p /&gt;
+&lt;para /&gt;</code></pre>
+			  </li>
               <li class="fragment">
                 <p>
                   Or different attributes:
-                  <pre><code class="hljs">&lt;bold /&gt;
-&lt;emphasis bold="true" /&gt;
+                  <pre><code class="hljs">&lt;emphasis bold="true" /&gt;
 &lt;emphasis type="bold" /&gt;</code></pre>
                 </p>
               </li>
@@ -87,16 +90,34 @@ to present why Fonto works like it works.</p></code></pre>
 		  </section>
         </section>
 
-		<section>
-		  <h2>Families</h2>
+		<section id="cur">
+		  <h2>Flow properties</h2>
 		  <ul>
-			<li>Blocks</li>
-			<li>Inlines</li>
-			<li>Frames</li>
-			<li>...</li>
+			<li>Splittable<ul><li>Can we split this element?</li></ul></li>
+			<li>Closed<ul><li>Can we move our cursor out of this element?</li></ul></li>
+			<li>Detached<ul><li>Is this element actually 'here'?</li></ul></li>
 		  </ul>
 		</section>
+	  <section>
+		<h2>Blueprints</h2>
+		<p>To allow us to 'try' out these changes, and revert them if they were bad</p>
+		<pre><code style="font-size: .75em; line-height:1.25em" class="js">const blueprint = new Blueprint();
 
+const newElement = document.createElement('newElement');
+blueprint.appendChild(newParent, newElement);
+const newParent = blueprint.getParentNode(newElement);
+// newParent is now set the documentElement node.
+
+const isValid = validator.isValidNode(blueprint, newParent);
+// The validator is passed the blueprint so it can see
+// whether the new structure is valid
+
+if (isValid) {
+  // We know it's valid, so we can safely apply these changes to the DOM
+  blueprint.realize();
+}</code></pre>
+	  </section
+>
 		<section>
 		  <section>
 			<h2>Smart commands</h2>
@@ -160,26 +181,27 @@ to present why Fonto works like it works.</p></code></pre>
   </ul>
 </div></code></pre>
 				</div>
+				<aside class="notes" data-markdown>
+				  * The most succesful point in Fonto are Blueprints: overlays on the DOM
+				  * These allows us to easily sketch out a future situation
+				</aside>
 		  </section>
 		</section>
 	  <section>
-		<h2>Blueprints</h2>
-		<p>To allow us to 'try' out these changes, and revert them if they were bad</p>
-		<pre><code style="font-size: .75em; line-height:1.25em" class="js">const blueprint = new Blueprint();
-
-const newElement = document.createElement('newElement');
-blueprint.appendChild(newParent, newElement);
-const newParent = blueprint.getParentNode(newElement);
-// newParent is now set the documentElement node.
-
-const isValid = validator.isValidNode(blueprint, newParent);
-// The validator is passed the blueprint so it can see
-// whether the new structure is valid
-
-if (isValid) {
-  // We know it's valid, so we can safely apply these changes to the DOM
-  blueprint.realize();
-}</code></pre>
+		<h2>Schema knowledge</h2>
+		<p>Splitting a Section with a required title</p>
+		<div style="position: relative">
+	  <div style="position: absolute;" class="fragment fade-in stretch">
+		<pre><code class="hljs xml"><section>
+			  <title></title>
+			</section></code></pre>
+	  </section>
+	  <section>
+		<h2>Next steps</h2>
+		<ul>
+		  <li>XQuery</li>
+		  <li>XQuery Update Facility</li>
+		</ul>
 	  </section>
 	  <section><h2>Questions</h2></section>
     </div>
