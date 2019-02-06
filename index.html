@@ -1,49 +1,210 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
 
-		<title>reveal.js</title>
+    <title>How to configure an editor</title>
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+    <link rel="stylesheet" href="css/reveal.css" />
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css" />
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+    <!-- Fonto style -->
+    <link rel="stylesheet" href="lib/css/fonto.css" />
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
-		</div>
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.type = "text/css";
+      link.href = window.location.search.match(/print-pdf/gi)
+        ? "css/print/pdf.css"
+        : "css/print/paper.css";
+      document.getElementsByTagName("head")[0].appendChild(link);
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section class="first" id="1">
+          <h1>How to configure an editor</h1>
+          <p>
+            Martin Middel <br />
+            <a href="http://www.fontoxml.com">FontoXML.com</a>
+          </p>
+        </section>
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+        <section>
+		  <section>
+			<h2>The problem</h2>
+			<aside class="notes">
+			  <ul>
+				<li>First, let me explain our problem, and why it is more <b>complex</b> than you'd might expect</li>
+			  </ul>
+			</aside>
+		  </section>
+          <section id="cur">
+            <h2>Schema-agnostic</h2>
+            <ul>
+              <li>Most are 'like HTML', but different names</li>
+              <li class="fragment">
+                <p>
+                  Or different attributes:
+                  <pre><code class="hljs">&lt;bold /&gt;
+&lt;emphasis bold="true" /&gt;
+&lt;emphasis type="bold" /&gt;</code></pre>
+                </p>
+              </li>
+            </ul>
+			<aside class="notes" data-markdown>
+			  * Most schemata are basically HTML, but with different names
+			  * But with some changes
+			</aside>
+          </section>
+		  <section>
+			<p>Or other structures</p>
+			<pre><code class="html hljs" style="font-size:.5em; line-height:1em"><p>Martin is going to XML
+	<choiceEntryOption>
+	  <correctEntry>
+		<entryContent>Prague</entryContent>
+		<feedbackEntry>Correct!</feedbackEntry>
+	  </correctEntry>
+	  <incorrectEntry>
+		<entryContent>London</entryContent>
+		<feedbackEntry>Incorrect</feedbackEntry>
+	  </incorrectEntry>
+	  <incorrectEntry>
+		<entryContent>Amsterdam</entryContent>
+		<feedbackEntry>Is that even a thing anymore?</feedbackEntry>
+	  </incorrectEntry>
+	</choiceEntryOption>
+to present why Fonto works like it works.</p></code></pre>
+			<img src="lib/images/interaction.png" class="stretch"/>
+		  </section>
+        </section>
 
-		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
-			Reveal.initialize({
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-				]
-			});
-		</script>
-	</body>
+		<section>
+		  <h2>Families</h2>
+		  <ul>
+			<li>Blocks</li>
+			<li>Inlines</li>
+			<li>Frames</li>
+			<li>...</li>
+		  </ul>
+		</section>
+
+		<section>
+		  <section>
+			<h2>Smart commands</h2>
+			<p>Use schema knowledge to compute actions</p>
+		  </section>
+		  <section>
+			<h2>(Vertical) insert node</h2>
+			<p>Insert an image, somewhere 'here'</p>
+			<ol>
+			  <li>Try to insert at the cursor</li>
+			  <li>Validate</li>
+			  <li>If invalid: discard changes and split the parent</li>
+			  <li>Return to step 1</li>
+			</ol>
+	  <div style="position: absolute;" class="fragment fade-in stretch">
+		<pre><code class="hljs xml"><div>
+  <ul>
+    <li>A piece of| Text</li>
+  </ul>
+ </div></code></pre></div>
+				<div style="position: absolute;" class="fragment fade-in stretch">
+				  <pre><code class="hljs xml"><div>
+  <ul>
+    <li>A piece of&lt;img src="..."/&gt;| Text</li>
+  </ul>
+ </div></code></pre></div>
+				<div style="position: absolute;" class="fragment fade-in stretch">
+				  <pre><code class="hljs xml"><div>
+  <ul>
+    <li>A piece</li>
+|
+    <li> of Text</li>
+  </ul>
+</div></code></pre></div>
+				<div style="position: absolute;" class="fragment fade-in stretch">
+				  <pre><code class="hljs xml"><div>
+  <ul>
+    <li>A piece</li>
+    &lt;img src="..." /&gt;|
+    <li> of Text</li>
+  </ul>
+</div></code></pre></div>
+				<div style="position: absolute;" class="fragment fade-in stretch">
+				  <pre><code class="hljs xml"><div>
+  <ul>
+    <li>A piece</li>
+  <ul>
+  |
+  </ul>
+    <li> of Text</li>
+  </ul>
+</div></code></pre></div>
+				<div style="position: absolute;" class="fragment fade-in stretch">
+				  <pre><code class="hljs xml"><div>
+  <ul>
+    <li>A piece</li>
+  <ul>
+  &lt;img src="..." /&gt;|
+  </ul>
+    <li> of Text</li>
+  </ul>
+</div></code></pre>
+				</div>
+		  </section>
+		</section>
+	  <section>
+		<h2>Blueprints</h2>
+		<p>To allow us to 'try' out these changes, and revert them if they were bad</p>
+		<pre><code style="font-size: .75em; line-height:1.25em" class="js">const blueprint = new Blueprint();
+
+const newElement = document.createElement('newElement');
+blueprint.appendChild(newParent, newElement);
+const newParent = blueprint.getParentNode(newElement);
+// newParent is now set the documentElement node.
+
+const isValid = validator.isValidNode(blueprint, newParent);
+// The validator is passed the blueprint so it can see
+// whether the new structure is valid
+
+if (isValid) {
+  // We know it's valid, so we can safely apply these changes to the DOM
+  blueprint.realize();
+}</code></pre>
+	  </section>
+	  <section><h2>Questions</h2></section>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+     // More info about config & dependencies:
+     // - https://github.com/hakimel/reveal.js#configuration
+     // - https://github.com/hakimel/reveal.js#dependencies
+     Reveal.initialize({
+		 dependencies: [
+			 { src: "plugin/markdown/marked.js" },
+			 { src: "plugin/markdown/markdown.js" },
+			 { src: "plugin/notes/notes.js", async: true },
+			 {
+				 src: "plugin/highlight/highlight.js",
+				 async: true,
+				 callback: function() {
+					 hljs.initHighlightingOnLoad();
+				 }
+			 }
+		 ]
+     });
+    </script>
+  </body>
 </html>
