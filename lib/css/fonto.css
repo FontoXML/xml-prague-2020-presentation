@@ -37,6 +37,8 @@ section.has-light-background h6 {
   content: "";
   transition: background-size 150ms linear;
 }
+
+.slide-background.last::before,
 .slide-background.first::before {
 	top: -100px;
   background-size: 500px 500px;
@@ -52,7 +54,11 @@ section.has-light-background h6 {
   background-image: url('../images/structured_background.jpg')
 }
 
-.slide-background:not(.first)::after {
+.slide-background.last {
+  background-image: url('../images/fonto_homepage.jpg') !important
+}
+
+.slide-background::after {
 	background-color: #cc1a5b;
 	position:absolute;
 	top:0;
@@ -60,6 +66,11 @@ section.has-light-background h6 {
 	left:0;
 	right: 0;
 	content:'';
+}
+
+.slide-background.last::after,
+.slide-background.first::after {
+	height: 0px;
 }
 
 /*********************************************
