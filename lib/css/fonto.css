@@ -4,44 +4,73 @@
  * By Hakim El Hattab, http://hakim.se
  */
 @import url(../../lib/font/source-sans-pro/source-sans-pro.css);
-section.has-light-background,
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans|Ubuntu');
+
+section {
+	padding-top: 10vh !important;
+	color: #2f054b
+}
+
+section.has-light-background {
+	color: #2f054b
+}
 section.has-light-background h1,
 section.has-light-background h2,
 section.has-light-background h3,
 section.has-light-background h4,
 section.has-light-background h5,
 section.has-light-background h6 {
-  color: #222;
+  color: #cc1a5b;
 }
 
 /*********************************************
  * HEADER IMAGE
  *********************************************/
 .slide-background::before {
-  position: absolute;
+	z-index:999999;
+	position: absolute;
   background-image: url("../images/Fonto_Logo_Outline.svg");
   background-size: 200px 200px;
   height: 200px;
   width: 200px;
+  top: -50px;
   content: "";
   transition: background-size 150ms linear;
 }
 .slide-background.first::before {
-  background-size: 400px 400px;
-  height: 400px;
-  width: 400px;
+	top: -100px;
+  background-size: 500px 500px;
+  height: 500px;
+  width: 500px;
+}
+
+.slide-background.first {
+	background-image: url('../images/bg.jpg')
+}
+
+.slide-background:not(.first) {
+  background-image: url('../images/structured_background.jpg')
+}
+
+.slide-background:not(.first)::after {
+	background-color: #cc1a5b;
+	position:absolute;
+	top:0;
+	height: 10vh;
+	left:0;
+	right: 0;
+	content:'';
 }
 
 /*********************************************
  * GLOBAL STYLES
  *********************************************/
 body {
-  background: rgb(209, 26, 112);
-  background-color: rgb(209, 26, 112);
+  background-color: #fff
 }
 
 .reveal {
-  font-family: "Fire Sans", Helvetica, sans-serif;
+  font-family: "Ubuntu", Helvetica, sans-serif;
   font-size: 42px;
   font-weight: normal;
   color: #fff;
@@ -75,14 +104,18 @@ body {
 .reveal h5,
 .reveal h6 {
   margin: 0 0 20px 0;
-  color: #fff;
-  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  color: #cc1a5b;
+  font-family: "Fira Sans", Helvetica, sans-serif;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: normal;
-  text-transform: uppercase;
+/**  text-transform: uppercase;*/
   text-shadow: none;
   word-wrap: break-word;
+}
+
+.reveal :not(.first) h1 {
+	color: white
 }
 
 .reveal h1 {

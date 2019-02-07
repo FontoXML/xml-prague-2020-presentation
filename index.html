@@ -34,7 +34,7 @@
           <h1>How to configure an editor</h1>
           <p>
             Martin Middel <br />
-            <a href="http://www.fontoxml.com">FontoXML</a>
+			FontoXML
           </p>
         </section>
 
@@ -158,17 +158,29 @@ to present why Fonto works like it works.</p></code></pre>
 				  * These allows us to easily sketch out a future situation
 				</aside>
 		  </section>
+		  <section>
+			<h2>Deep schema knowledge</h2>
+			<p>Splitting a Section with a required title</p>
+			<pre><code class="hljs xml">&lt;section&gt;
+  &lt;title&gt;&lt;/title&gt;
+&lt;/section&gt;</code></pre>
+			<aside class="note">Another concept that proved to be
+			useful is to leverage schema knowledge. What if the node
+			we just split had required children. I won't explain this
+			now because of its complexity, btut come find me after the
+			rpesentation for a more in-depth discussion</aside>
+		  </section>
 		</section>
-		<section>
+		<section id="here">
+		  <section>
 		  <h2>Composable mutations</h2>
 		  <ul>
-			<li>
-			  Insert a node vertically</li>
-			<li class="fragment">, OR append if it can't be
-			</li>
-			<li class="fragment">
-			  Overlays
-			</li>
+			<li>Insert a node vertically</li>
+			<li class="fragment">, OR append if it can't be</li>
+		  </ul>
+		  <ul>
+			<li  class="fragment">Wrap the selection</li>
+			<li class="fragment">, OR insert if there is no selection</li>
 		  </ul>
 		  <aside class="notes" data-markdown>
 			* We combine the mutations like Vertical Insert with other
@@ -177,10 +189,15 @@ to present why Fonto works like it works.</p></code></pre>
 			* For this, we extended our blueprints to allow overlaying
 			* This allows us to 'discard' changes if they were bad
 		  </aside>
-		</section>
+		  </section>
+		  <section>
+			<h2>Overlays</h2>
+			<ul><li>TODO</li></ul>
+			</section>
+		  </section>
 		<section>
 		  <h2>Operations</h2>
-		  <pre><code class="json">{
+		  <pre class="stretch"><code class="json">{
   "insert-image": {
     "steps": [
       { "type": "modal/open-image-browser" },
@@ -214,38 +231,54 @@ to present why Fonto works like it works.</p></code></pre>
 		<section>
 		  <h2>JS-based selectors</h2>
 		  <pre class="fragment"><code class="js">matchNodeName("emphasis").withAttribute("type", "bold")</code></pre>
-		  <pre class="fragment"><code class="js">matchNodeName("emphasis")
+		  <h2>Stencils</h2>
+		  <h1>TODO EXAMPLE</h1>
+		  <aside class="notes">We needed a way to relate these flow
+		  properties with nodes, so we made a fluent API, heavily
+		  inspired by CSS</aside>
+		</section>
+		<section>
+		  <section>
+			<h2>Refinement</h2>
+			<pre class="fragment"><code class="js">matchNodeName("emphasis")
   .withAttribute("type", "bold")
   .requireNodePredicate(
     (node, blueprint) =>
-       matchNodeName("someElement")(blueprint.getParentNode(node).nodeName === "someElement")</code></pre>
-		  <aside class="notes">We needed a way to relate these flow properties with nodes, so we made a fluent API, heavily inspired by CSS</aside>
+	  matchNodeName("someElement")
+        .matches(
+           blueprint.getParentNode(node),
+           blueprint)</code></pre>
+			<p class="fragment">
+			  Selectors -> XPath
+			</p>
+			<p>Bonus: observable implementation, see two years ago</p>
+			<pre><code class="xpath">self::emphasis[@type="bold" and parent::someElement] </code></pre>
+			<aside class="notes"> Mention serializability: operations.json + back-end services</aside>
+		  </section>
+		  <section>
+			<h2>Stencils -> XQuery</h2>
+			TODO: Example
+		  </section>
 		</section>
 		<section>
-		  <h2>Deep schema knowledge</h2>
-		  <p>Splitting a Section with a required title</p>
-		  <pre><code class="hljs xml">&lt;section&gt;
-  &lt;title&gt;&lt;/title&gt;
-&lt;/section&gt;</code></pre>
-		  <aside class="note">Another concept that proved to be useful is to leverage schema knowledge</aside>
-		</section>
-		<section>
-		  <h2>Next steps</h2>
-		  <p>XQuery / Update Facility</p>
+		  <p>Operations -> Update Facility (WIP)</p>
 		  <ul>
 			<li>Open questions:</li>
 			<li>Blueprints / Overlays</li>
-			<li>Incoorporate UI (Do we want to?)</li>
+			<li>integrate UI (do we want to?)</li>
 		  </ul>
 		  <aside class="notes" data-markdown>
 			* We are working to have more XQuery APIs in Fonto.
-			* They are better knwon,
+			* They are better known,
 			* larger community (than our Fonto APIs),
 			* are more consise
+			* Less maintainance: docs are done
+			* API churn: open standard, so they're stable and well thought-out (hopefully)
 
 			But we are running into questions:
 
-			* How to keep our Blueprints / composability
+			* How to keep our Blueprints / composability we like
+			* How to interface with non-DOM state (and by extension sideeffects)
 		  </aside>
 		</section>
 		<section>
@@ -255,6 +288,7 @@ to present why Fonto works like it works.</p></code></pre>
 			<li class="fragment">So build your own</li>
 			<li>Building your own APIs is fast</li>
 			<li class="fragment">But standards are better</li>
+			<li class="fragment">So implement them yourselves</li>
 		  </ul>
 		</section>
 		<section><h2>Questions</h2></section>
