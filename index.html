@@ -98,7 +98,7 @@ to present why Fonto works like it works.</p></code></pre>
 		  <section>
 			<h2>(Vertically) insert node</h2>
 			<p>Insert an image, somewhere 'here'</p>
-			<ol>
+			<ol style="font-size:.8em">
 			  <li>Try to insert at the cursor</li>
 			  <li>Validate</li>
 			  <li>If invalid: discard changes and split the parent</li>
@@ -159,16 +159,48 @@ to present why Fonto works like it works.</p></code></pre>
 				</aside>
 		  </section>
 		  <section>
-			<h2>Deep schema knowledge</h2>
-			<p>Splitting a Section with a required title</p>
-			<pre><code class="hljs xml">&lt;section&gt;
-  &lt;title&gt;&lt;/title&gt;
+	  <section>
+		<h2>Blueprints</h2>
+		<p>'Try' out these changes, and revert them if they were bad</p>
+		<pre><code style="font-size: .75em; line-height:1.25em" class="js">const blueprint = new Blueprint();
+
+const newElement = document.createElement('newElement');
+blueprint.appendChild(newParent, newElement);
+const newParent = blueprint.getParentNode(newElement);
+// newParent is now set the documentElement node.
+
+const isValid = validator.isValidNode(blueprint, newParent);
+// The validator is passed the blueprint so it can see
+// whether the new structure is valid
+
+if (isValid) {
+  // We know it's valid, so we can safely apply these changes to the DOM
+  blueprint.realize();
+}</code></pre>
+	  </section
+>
+
+			</section>
+		  <section>
+            <h2>Deep schema knowledge</h2>
+            <p>What if the node we split has required children?</p>
+            <pre><code class="hljs xml">&lt;section&gt;
+    &lt;title&gt;&lt;/title&gt;
+    &lt;p&gt;before split&lt;/p&gt;
+&lt;/section&gt;
+&lt;section&gt;
+    &lt;title&gt;&lt;/title&gt; &lt;--
+    &lt;p&gt;after split&lt;/p&gt;
 &lt;/section&gt;</code></pre>
-			<aside class="note">Another concept that proved to be
-			useful is to leverage schema knowledge. What if the node
-			we just split had required children. I won't explain this
-			now because of its complexity, btut come find me after the
-			rpesentation for a more in-depth discussion</aside>
+			<aside class="notes" data-markdown>
+			  * Another concept that proved to be
+			  useful is to leverage schema knowledge.
+			  * What if the node we just split had required children.
+			  * Fonto has a way to make sure that the outcome of the mutation had these
+			  children.
+			  * I won't explain this now because of its
+			complexity, but come find me after the rpesentation for a
+			more in-depth discussion</aside>
 		  </section>
 		</section>
 		<section id="here">
@@ -177,22 +209,22 @@ to present why Fonto works like it works.</p></code></pre>
 		  <ul>
 			<li>Insert a node vertically</li>
 			<li class="fragment">, OR append if it can't be</li>
-			<li  class="fragment">Wrap the selection</li>
+			<li class="fragment">Wrap the selection</li>
 			<li class="fragment">, OR insert if there is no selection</li>
 		  </ul>
 		  <aside class="notes" data-markdown>
 			* We combine the mutations like Vertical Insert with other
-		  mutations, like Horizontal Insert, ensuring a node is
-		  present somewhere, etc.
+			mutations, like Horizontal Insert, ensuring a node is
+			present somewhere, etc.
 			* For this, we extended our blueprints to allow overlaying
 			* This allows us to 'discard' changes if they were bad
 		  </aside>
 		  </section>
 		  <section>
 			<h2>Overlays</h2>
-			<ul><li>TODO</li></ul>
-			</section>
+			<ul><li>Blueprints, but layered</li></ul>
 		  </section>
+		</section>
 		<section>
 		  <h2>Operations</h2>
 		  <pre class="stretch"><code class="json">{
@@ -228,14 +260,27 @@ to present why Fonto works like it works.</p></code></pre>
 		</section>
 		<section>
 		  <h2>JS-based selectors</h2>
-		  <pre class="fragment"><code class="js">matchNodeName("emphasis").withAttribute("type", "bold")</code></pre>
-		  <h2>Stencils</h2>
-		  <h1>TODO EXAMPLE</h1>
+		  <pre><code class="js">matchNodeName("emphasis").withAttribute("type", "bold")</code></pre>
 		  <aside class="notes">We needed a way to relate these flow
 		  properties with nodes, so we made a fluent API, heavily
 		  inspired by CSS</aside>
 		</section>
 		<section>
+		  <h2>Stencils</h2>
+		  <pre><code class="jsonml">[
+  "figure",
+  [
+    "title",
+    [{
+      "bindTo": "titleGap",
+      "multiple": true,
+     "required": false
+    }]
+  ],
+  ["img", { "href": { "bindTo": "hrefGap"}}]
+]</code></pre>
+		  <aside class="notes">And we needed a way to template xml fragments: jsonml</aside>
+		</section>
 		  <section>
 			<h2>Refinement</h2>
 			<pre class="fragment"><code class="js">matchNodeName("emphasis")
@@ -246,20 +291,22 @@ to present why Fonto works like it works.</p></code></pre>
         .matches(
            blueprint.getParentNode(node),
            blueprint)</code></pre>
-			<p class="fragment">
+			<p>
 			  Selectors -> XPath
 			</p>
-			<p>Bonus: observable implementation, see two years ago</p>
-			<pre><code class="xpath">self::emphasis[@type="bold" and parent::someElement] </code></pre>
-			<aside class="notes"> Mention serializability: operations.json + back-end services</aside>
+			<pre  class="fragment"><code class="xpath">self::emphasis[@type="bold" and parent::someElement] </code></pre>
+			<aside class="notes"> Mention serializability: operations.json + back-end services 			<p>Bonus: observable implementation, see two years ago</p>
+</aside>
 		  </section>
 		  <section>
 			<h2>Stencils -> XQuery</h2>
-			TODO: Example
-		  </section>
-		</section>
+			<pre><code>&lt;figure&gt;
+  &lt;title&gt;{&data("title")}&lt;/title&gt;
+  &lt;img @href="{href}" /&gt;
+&lt;/figure&gt;</code></pre>
+</section>
 		<section>
-		  <h2>Operations -> Update Facility (WIP)</h2>
+		  <h2>Operations -> Update Facility</h2><h3 style="color: #a08b62"> (WIP)</h3>
 		  <ul>
 			<li>Open questions:</li>
 			<li>Blueprints / Overlays</li>
@@ -289,7 +336,7 @@ to present why Fonto works like it works.</p></code></pre>
 			<li class="fragment">So implement them yourselves</li>
 		  </ul>
 		</section>
-		<section class="last"><h2>Questions</h2></section>
+		<section class="last"><h2 style="color:white">Questions</h2></section>
       </div>
 
     <script src="lib/js/head.min.js"></script>
