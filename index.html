@@ -1,365 +1,190 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+		/>
 
-    <title>How to configure an editor</title>
+		<title>A Note on Editor Performance</title>
 
-    <link rel="stylesheet" href="css/reveal.css" />
-    <!-- Theme used for syntax highlighting of code -->
-    <link rel="stylesheet" href="lib/css/zenburn.css" />
+		<link rel="stylesheet" href="css/reveal.css" />
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css" />
 
-    <!-- Fonto style -->
-    <link rel="stylesheet" href="lib/css/fonto.css" />
+		<!-- Fonto style -->
+		<link rel="stylesheet" href="lib/css/fonto.css" />
 
-    <!-- Printing and PDF exports -->
-    <script>
-      var link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.type = "text/css";
-      link.href = window.location.search.match(/print-pdf/gi)
-        ? "css/print/pdf.css"
-        : "css/print/paper.css";
-      document.getElementsByTagName("head")[0].appendChild(link);
-    </script>
-  </head>
-  <body>
-    <div class="reveal">
-      <div class="slides">
-        <section class="first" id="1">
-          <h2 style="color: white">How to configure an editor</h2>
-          <p>
-            <strong style="color: #a08b62"> Martin Middel</strong> <br />
-			<strong>FontoXML</strong>
-          </p>
-        </section>
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement('link');
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match(/print-pdf/gi)
+				? 'css/print/pdf.css'
+				: 'css/print/paper.css';
+			document.getElementsByTagName('head')[0].appendChild(link);
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section class="first" id="1">
+					<h2 style="color: white">A Note on Editor Performance</h2>
+					<p>
+						<strong style="color: #a08b62">Martin Middel</strong> &
+						<strong style="color: #a08b62">Stef Busking</strong> <br />
+						<strong>Fonto</strong>
+					</p>
+				</section>
 
-        <section>
-		  <section>
-			<h2>The problem</h2>
-			<aside class="notes">
-			  <ul>
-				<li>First, let me explain our problem, and why it is more <b>complex</b> than you'd might expect</li>
-			  </ul>
-			</aside>
-		  </section>
-          <section>
-            <h2>Schemata</h2>
-            <ul>
-              <li>
-				<p>Most are 'like HTML', but different names</p>
-				<pre><code class="hljs xml">&lt;p /&gt;
-&lt;para /&gt;</code></pre>
-			  </li>
-              <li class="fragment">
-                <p>
-                  Or different attributes:
-                  <pre><code class="hljs">&lt;emphasis bold="true" /&gt;
-&lt;emphasis type="bold" /&gt;</code></pre>
-                </p>
-              </li>
-            </ul>
-			<aside class="notes" data-markdown>
-			  * Most schemata are basically HTML, but with different names
-			  * But with some changes
-			</aside>
-          </section>
-		  <section>
-			<p>Or other structures</p>
-			<pre><code class="html hljs" style="font-size:.5em; line-height:1em"><p>Martin is going to XML
-	<choiceEntryOption>
-	  <correctEntry>
-		<entryContent>Prague</entryContent>
-		<feedbackEntry>Correct!</feedbackEntry>
-	  </correctEntry>
-	  <incorrectEntry>
-		<entryContent>London</entryContent>
-		<feedbackEntry>Incorrect</feedbackEntry>
-	  </incorrectEntry>
-	  <incorrectEntry>
-		<entryContent>Amsterdam</entryContent>
-		<feedbackEntry>Is that even a thing anymore?</feedbackEntry>
-	  </incorrectEntry>
-	</choiceEntryOption>
-to present why Fonto works like it works.</p></code></pre>
-			<img src="lib/images/interaction.png" class="stretch"/>
-		  </section>
-        </section>
+				<section>
+					<section>
+						<h2>What is Fonto?</h2>
+						<ul>
+							<li>Schema experience</li>
+							<li>Operations</li>
+							<li>User interface</li>
+						</ul>
+						<aside class="notes">
+							<ul>
+								<li>TODO</li>
+							</ul>
+						</aside>
+					</section>
 
-		<section>
-		  <section>
-			<h2>Smart commands</h2>
-			<p>Use schema knowledge to compute actions</p>
-		  </section>
-		  <section>
-			<h2>(Vertically) insert node</h2>
-			<p>Insert an image, somewhere 'here'</p>
-			<ol style="font-size:.8em">
-			  <li>Try to insert at the cursor</li>
-			  <li>Validate</li>
-			  <li>If invalid: discard changes and split the parent</li>
-			  <li>Return to step 1</li>
-			</ol>
-	  <div style="position: absolute;" class="fragment fade-in stretch">
-		<pre><code class="hljs xml"><div>
-  <ul>
-    <li>A piece of| Text</li>
-  </ul>
- </div></code></pre></div>
-				<div style="position: absolute;" class="fragment fade-in stretch">
-				  <pre><code class="hljs xml"><div>
-  <ul>
-    <li>A piece of&lt;img src="..."/&gt;| Text</li>
-  </ul>
- </div></code></pre></div>
-				<div style="position: absolute;" class="fragment fade-in stretch">
-				  <pre><code class="hljs xml"><div>
-  <ul>
-    <li>A piece</li>
-|
-    <li> of Text</li>
-  </ul>
-</div></code></pre></div>
-				<div style="position: absolute;" class="fragment fade-in stretch">
-				  <pre><code class="hljs xml"><div>
-  <ul>
-    <li>A piece</li>
-    &lt;img src="..." /&gt;|
-    <li> of Text</li>
-  </ul>
-</div></code></pre></div>
-				<div style="position: absolute;" class="fragment fade-in stretch">
-				  <pre><code class="hljs xml"><div>
-  <ul>
-    <li>A piece</li>
-  <ul>
-  |
-  </ul>
-    <li> of Text</li>
-  </ul>
-</div></code></pre></div>
-				<div style="position: absolute;" class="fragment fade-in stretch">
-				  <pre><code class="hljs xml"><div>
-  <ul>
-    <li>A piece</li>
-  <ul>
-  &lt;img src="..." /&gt;|
-  </ul>
-    <li> of Text</li>
-  </ul>
-</div></code></pre>
-				</div>
-				<aside class="notes" data-markdown>
-				  * The most succesful point in Fonto are Blueprints: overlays on the DOM
-				  * These allows us to easily sketch out a future situation
-				</aside>
-		  </section>
-		  <section>
-	  <section>
-		<h2>Blueprints</h2>
-		<p>'Try' out these changes, and revert them if they were bad</p>
-		<pre><code style="font-size: .75em; line-height:1.25em" class="js">const blueprint = new Blueprint();
+					<section>
+						<h2>What is performance?</h2>
+						<aside class="notes">
+							<ul>
+								<li>TODO</li>
+							</ul>
+						</aside>
+					</section>
+				</section>
 
-const newElement = document.createElement('newElement');
-blueprint.appendChild(newParent, newElement);
-const newParent = blueprint.getParentNode(newElement);
-// newParent is now set the documentElement node.
+				<section>
+					<section>
+						<h2>Accessing configuration</h2>
+					</section>
 
-const isValid = validator.isValidNode(blueprint, newParent);
-// The validator is passed the blueprint so it can see
-// whether the new structure is valid
+					<section>
+						<h2>Orthogonal configuration</h2>
+					</section>
 
-if (isValid) {
-  // We know it's valid, so we can safely apply these changes to the DOM
-  blueprint.realize();
-}</code></pre>
-	  </section
->
+					<section>
+						<h2>Selector buckets</h2>
+					</section>
 
-			</section>
-		  <section>
-            <h2>Deep schema knowledge</h2>
-            <p>What if the node we split has required children?</p>
-            <pre><code class="hljs xml">&lt;section&gt;
-    &lt;title&gt;&lt;/title&gt;
-    &lt;p&gt;before split&lt;/p&gt;
-&lt;/section&gt;
-&lt;section&gt;
-    &lt;title&gt;&lt;/title&gt; &lt;--
-    &lt;p&gt;after split&lt;/p&gt;
-&lt;/section&gt;</code></pre>
-			<aside class="notes" data-markdown>
-			  * Another concept that proved to be
-			  useful is to leverage schema knowledge.
-			  * What if the node we just split had required children.
-			  * Fonto has a way to make sure that the outcome of the mutation had these
-			  children.
-			  * I won't explain this now because of its
-			complexity, but come find me after the rpesentation for a
-			more in-depth discussion</aside>
-		  </section>
-		</section>
-		<section id="here">
-		  <section>
-		  <h2>Composable mutations</h2>
-		  <ul>
-			<li>Insert a node vertically</li>
-			<li class="fragment">, OR append if it can't be</li>
-			<li class="fragment">Wrap the selection</li>
-			<li class="fragment">, OR insert if there is no selection</li>
-		  </ul>
-		  <aside class="notes" data-markdown>
-			* We combine the mutations like Vertical Insert with other
-			mutations, like Horizontal Insert, ensuring a node is
-			present somewhere, etc.
-			* For this, we extended our blueprints to allow overlaying
-			* This allows us to 'discard' changes if they were bad
-		  </aside>
-		  </section>
-		  <section>
-			<h2>Overlays</h2>
-			<ul><li>Blueprints, but layered</li></ul>
-		  </section>
-		</section>
-		<section>
-		  <h2>Operations</h2>
-		  <pre class="stretch"><code class="json">{
-  "insert-image": {
-    "steps": [
-      { "type": "modal/open-image-browser" },
-      {
-        "type": "command/insert-node",
-        "data": {
-          "childNodeStructure": [
-            "img", { "src": "{{href}}" ]
-          ]
-        }
-      }
-    ]
-  }
-}</code></pre>
-		  <aside class="notes">These composable mutations can be composed in operations, which also do UI</aside>
-		</section>
-		<section id="cur">
-		  <h2>Flow properties</h2>
-		  <h6>More abstract commands</h6>
-		  <ul>
-			<li><strong style="color: #a08b62">Splittable</strong><ul style="font-size: .8em"><li>Can we split this element?</li></ul></li>
-			<li><strong style="color: #a08b62">Closed</strong><ul style="font-size: .8em"><li>Can we move our cursor out of this element?</li></ul></li>
-			<li><strong style="color: #a08b62">Detached</strong><ul style="font-size: .8em"><li>Is this element actually 'here'?</li></ul></li>
-		  </ul>
-		  <aside class="notes" data-markdown>
-			* E-mail addresses are unsplittable
-			* Footnotes are closed
-			* Metadata elements are not really 'there'
-		  </aside>
-		</section>
-		<section>
-		  <h2>JS-based selectors</h2>
-		  <pre><code class="js">matchNodeName("emphasis").withAttribute("type", "bold")</code></pre>
-		  <aside class="notes">We needed a way to relate these flow
-		  properties with nodes, so we made a fluent API, heavily
-		  inspired by CSS</aside>
-		</section>
-		<section>
-		  <h2>Stencils</h2>
-		  <pre><code class="jsonml">[
-  "figure",
-  [
-    "title",
-    [{
-      "bindTo": "titleGap",
-      "multiple": true,
-     "required": false
-    }]
-  ],
-  ["img", { "href": { "bindTo": "hrefGap"}}]
-]</code></pre>
-		  <aside class="notes">And we needed a way to template xml fragments: jsonml</aside>
-		</section>
-		  <section>
-			<h2>Refinement</h2>
-			<pre class="fragment"><code class="js">matchNodeName("emphasis")
-  .withAttribute("type", "bold")
-  .requireNodePredicate(
-    (node, blueprint) =>
-	  matchNodeName("someElement")
-        .matches(
-           blueprint.getParentNode(node),
-           blueprint)</code></pre>
-			<p>
-			  Selectors -> XPath
-			</p>
-			<pre  class="fragment"><code class="xpath">self::emphasis[@type="bold" and parent::someElement] </code></pre>
-			<aside class="notes"> Mention serializability: operations.json + back-end services 			<p>Bonus: observable implementation, see two years ago</p>
-</aside>
-		  </section>
-		  <section>
-			<h2>Stencils -> XQuery</h2>
-			<pre><code>&lt;figure&gt;
-  &lt;title&gt;{&data("title")}&lt;/title&gt;
-  &lt;img @href="{href}" /&gt;
-&lt;/figure&gt;</code></pre>
-</section>
-		<section>
-		  <h2>Operations -> Update Facility</h2><h3 style="color: #a08b62"> (WIP)</h3>
-		  <ul>
-			<li>Open questions:</li>
-			<li>Blueprints / Overlays</li>
-			<li>integrate UI (do we want to?)</li>
-		  </ul>
-		  <aside class="notes" data-markdown>
-			* We are working to have more XQuery APIs in Fonto.
-			* They are better known,
-			* larger community (than our Fonto APIs),
-			* are more consise
-			* Less maintainance: docs are done
-			* API churn: open standard, so they're stable and well thought-out (hopefully)
+					<section>
+						<h2>Order of evaluation</h2>
+					</section>
 
-			But we are running into questions:
+					<section>
+						<h2>Results</h2>
+					</section>
+				</section>
 
-			* How to keep our Blueprints / composability we like
-			* How to interface with non-DOM state (and by extension sideeffects)
-		  </aside>
-		</section>
-		<section>
-		  <h2>Take-aways</h2>
-		  <ul>
-			<li>A lot of XML tools are missing in JavaScript</li>
-			<li class="fragment">So build your own</li>
-			<li>Building your own APIs is fast</li>
-			<li class="fragment">But standards are better</li>
-			<li class="fragment">So implement them yourselves</li>
-		  </ul>
-		</section>
-		<section class="last"><h2 style="color:white">Questions</h2></section>
-      </div>
+				<section>
+					<section>
+						<h2>Processing XML</h2>
+					</section>
 
-    <script src="lib/js/head.min.js"></script>
-    <script src="js/reveal.js"></script>
+					<section>
+						<h2>XPath performance</h2>
+						<ul>
+							<li>Lazy evaluation</li>
+							<li>Outermost</li>
+							<li>Buckets</li>
+						</ul>
+					</section>
 
-    <script>
-     // More info about config & dependencies:
-     // - https://github.com/hakimel/reveal.js#configuration
-     // - https://github.com/hakimel/reveal.js#dependencies
-     Reveal.initialize({
-		 dependencies: [
-			 { src: "plugin/markdown/marked.js" },
-			 { src: "plugin/markdown/markdown.js" },
-			 { src: "plugin/notes/notes.js", async: true },
-			 {
-				 src: "plugin/highlight/highlight.js",
-				 async: true,
-				 callback: function() {
-					 hljs.initHighlightingOnLoad();
-				 }
-			 }
-		 ]
-     });
-    </script>
-  </body>
+					<section>
+						<h2>XML Validation</h2>
+						<ul>
+							<li>NFA</li>
+							<li>Offline pre-processing</li>
+							<li>un-JavaScript-like optimizations</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>Indices - DOM</h2>
+						<ul>
+							<li>Attribute index</li>
+							<li>Bucket index</li>
+							<li>Descendant index</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>Indices - arbitrary computations</h2>
+						<ul>
+							<li>Dependency tracking</li>
+							<li>Caching & invalidation</li>
+							<li>Optimizations</li>
+						</ul>
+						<aside class="notes">
+							<ul>
+								<li>Mutation record type ~ dom access method</li>
+								<li>Dependency optimizations: filter functions, buckets</li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<h2>Related work</h2>
+					<ul>
+						<li>XSLT</li>
+						<li>XML databases</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>The end?</h2>
+					<ul>
+						<li>Many tricks possible</li>
+						<li>Browser-based XML processing can be fast</li>
+						<li>Lots more to do...</li>
+					</ul>
+					<aside>
+						<ul>
+							<li>
+								There are lots of ways to make processing XML fast, also for
+								interactive use cases
+							</li>
+							<li>Even in the browser, and without platform support</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section class="last"><h2 style="color:white">Questions</h2></section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{
+						src: 'plugin/highlight/highlight.js',
+						async: true,
+						callback: function() {
+							hljs.initHighlightingOnLoad();
+						}
+					}
+				]
+			});
+		</script>
+	</body>
 </html>
