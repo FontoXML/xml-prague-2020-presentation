@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8" />
@@ -9,12 +9,12 @@
 
 		<title>A Note on Editor Performance</title>
 
-		<link rel="stylesheet" href="css/reset.css">
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/theme/black.css" />
 
 		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/monokai.css">
+		<link rel="stylesheet" href="lib/css/monokai.css" />
 		<!-- Fonto style -->
 		<link rel="stylesheet" href="lib/css/fonto.css" />
 
@@ -51,16 +51,35 @@
 						</ul>
 						<aside class="notes">
 							<ul>
-								<li>TODO</li>
+								<li>Browser-based WYSIWYM XML editor</li>
+								<li>Configurable for any schema</li>
+								<li>Schema experience - how XML should look and behave</li>
+								<li>Operations - what changes can be made</li>
+								<li>
+									UI - not only documents themselves, but also metadata, operation
+									states, other derived data...
+								</li>
+								<li>
+									We prefer to use existing standards for our configuration: XPath
+									/ XQuery
+								</li>
 							</ul>
 						</aside>
 					</section>
 
 					<section>
 						<h2>What is performance?</h2>
+						<ul>
+							<li>Configuration lookups and queries</li>
+							<li>Validation</li>
+							<li>UI responsiveness</li>
+							<li>Sensitivity to configuration / document size</li>
+						</ul>
 						<aside class="notes">
 							<ul>
-								<li>TODO</li>
+								<li>Whenever you press a key...</li>
+								<li>Growing from 100KB to megabytes</li>
+								<li>Even more with JIT loading...</li>
 							</ul>
 						</aside>
 					</section>
@@ -69,28 +88,115 @@
 				<section>
 					<section>
 						<h2>Accessing configuration</h2>
+						<pre
+							class="fragment"
+						><code class="js">configureAsBlock(sxModule, 'self::p');</code></pre>
+						<table class="fragment">
+							<tr>
+								<th>Property</th>
+								<th>Value</th>
+							</tr>
+							<tr>
+								<td>Ignored for navigation</td>
+								<td>false</td>
+							</tr>
+							<tr>
+								<td>Splittable</td>
+								<td>true</td>
+							</tr>
+							<tr>
+								<td>Layout type</td>
+								<td>block</td>
+							</tr>
+							<tr>
+								<td>Inner layout type</td>
+								<td>inline</td>
+							</tr>
+							<tr>
+								<td>...</td>
+								<td>...</td>
+							</tr>
+						</table>
+
+						<aside class="notes">
+							<ul>
+								<li>
+									Lots of "flow properties" under water that control basic look
+									and feel
+								</li>
+								<li>
+									Lots of optional ones for extra's (formatting, behavior tweaks,
+									...)
+								</li>
+							</ul>
+						</aside>
 					</section>
 
 					<section>
 						<h2>Orthogonal configuration</h2>
+						<pre><code class="js">configureAsBlock(sxModule, 'self::p');</code></pre>
+						<pre><code class="js">configureAsBlock(sxModule, 'self::p[@align="right"]', {
+	align: 'right'
+});</code></pre>
+						<pre
+							class="fragment"
+						><code class="js">configureProperties(sxModule, 'self::p[@align="right"]', {
+	align: 'right'
+});</code></pre>
+						<aside class="notes">
+							<ul>
+								<li>
+									Instead of re-configuring all the basic properties to tweak
+									appearance, only redefine the single property.
+								</li>
+							</ul>
+						</aside>
 					</section>
 
 					<section>
 						<h2>Selector buckets</h2>
+						<aside class="notes">
+							<ul>
+								<li>Avoid evaluating each selector for each node</li>
+								<li>Bucket is simple "hash"</li>
+								<li>Group by bucket, only evaluate matching</li>
+							</ul>
+						</aside>
 					</section>
 
 					<section>
 						<h2>Order of evaluation</h2>
+						<aside class="notes">
+							<ul>
+								<li>Some selectors match more than others</li>
+								<li>Some rules are more likely to win than others</li>
+								<li>Specificity and priority</li>
+								<li>Bayesian predictor</li>
+							</ul>
+						</aside>
 					</section>
 
 					<section>
 						<h2>Results</h2>
+						<aside class="notes">
+							<ul>
+								<li>TODO: Some numbers here</li>
+								<li>Deduplication helps</li>
+							</ul>
+						</aside>
 					</section>
 				</section>
 
 				<section>
 					<section>
 						<h2>Processing XML</h2>
+						<aside class="notes">
+							<ul>
+								<li>What's an editor with no way to edit?</li>
+								<li>Get nodes of interest, modify, validate</li>
+								<li>Operation state: try it after every change</li>
+							</ul>
+						</aside>
 					</section>
 
 					<section>
@@ -131,6 +237,7 @@
 							<ul>
 								<li>Mutation record type ~ dom access method</li>
 								<li>Dependency optimizations: filter functions, buckets</li>
+								<li>Current / future work: incremental computation</li>
 							</ul>
 						</aside>
 					</section>
@@ -142,6 +249,22 @@
 						<li>XSLT</li>
 						<li>XML databases</li>
 					</ul>
+					<aside class="notes">
+						<ul>
+							<li>
+								XSLT similar to configuration, but usually selectors to templates is
+								almost 1:1, and there are many templates. In Fonto, we have few
+								values per property, so lots of selectors for the same value
+							</li>
+							<li>
+								XML databases also optimize XPath / XQuery, but different use case:
+								in Fonto edits are both frequent and very local. Browser-based means
+								data needs to be of a downloadable size and will therefore fit in
+								memory. Startup time needs to be fast, no persistent storage for
+								caches / indices, no expensive index builds possible.
+							</li>
+						</ul>
+					</aside>
 				</section>
 
 				<section>
@@ -158,6 +281,14 @@
 								interactive use cases
 							</li>
 							<li>Even in the browser, and without platform support</li>
+							<li>
+								We'll continue to improve indices as we further adopt XQUF - use for
+								operation states
+							</li>
+							<li>
+								We're still looking for a good declarative format for our schema
+								experience configuration - CSS fits, but selectors are not XPath
+							</li>
 						</ul>
 					</aside>
 				</section>
