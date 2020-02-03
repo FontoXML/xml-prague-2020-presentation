@@ -109,8 +109,8 @@
 								<td>block</td>
 							</tr>
 							<tr>
-								<td>Inner layout type</td>
-								<td>inline</td>
+								<td>Render as</td>
+								<td>Block template</td>
 							</tr>
 							<tr>
 								<td>...</td>
@@ -127,6 +127,10 @@
 								<li>
 									Lots of optional ones for extra's (formatting, behavior tweaks,
 									...)
+								</li>
+								<li>
+									"Best" selector wins, priority / specificity / order of
+									declaration
 								</li>
 							</ul>
 						</aside>
@@ -155,6 +159,25 @@
 
 					<section>
 						<h2>Selector buckets</h2>
+						<table border="1">
+							<tr>
+								<th>Selector</th>
+								<th>Bucket</th>
+							</tr>
+							<tr>
+								<td><code class="xpath">self::p</code></td>
+								<td>name-p</td>
+							</tr>
+							<tr>
+								<td><code class="xpath">self::element()</code></td>
+								<td>type-1</td>
+							</tr>
+							<tr>
+								<td><code class="xpath">self::p or self::div</code></td>
+								<td>type-1</td>
+							</tr>
+						</table>
+
 						<aside class="notes">
 							<ul>
 								<li>Avoid evaluating each selector for each node</li>
@@ -170,23 +193,111 @@
 							<ul>
 								<li>Some selectors match more than others</li>
 								<li>Some rules are more likely to win than others</li>
-								<li>Specificity and priority</li>
-								<li>Bayesian predictor</li>
+								<li>Take specificity and priority into account</li>
+								<li>
+									Bayesian predictor is generic enough to also support likely
+									attributes and cases where all selectors have equal specificity.
+								</li>
 							</ul>
 						</aside>
 					</section>
 
 					<section>
 						<h2>Results</h2>
+						<table border="1">
+							<tr>
+								<th />
+								<th>Amount of XPaths evaluated</th>
+							</tr>
+							<tr>
+								<td>Without the Bayesian predictor</td>
+								<td>121&nbsp;575</td>
+							</tr>
+							<tr>
+								<td>With the Bayesian predictor</td>
+								<td>109&nbsp;964</td>
+							</tr>
+						</table>
+
 						<aside class="notes">
 							<ul>
-								<li>TODO: Some numbers here</li>
-								<li>Deduplication helps</li>
+								<li>Deduplication of values helps (widgets etc)</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Results</h2>
+						<table border="1" style="font-size:.5em">
+							<tr>
+								<th>Selector</th>
+								<th align="center" colspan="2">without</th>
+								<th align="center" colspan="2">with</th>
+							</tr>
+
+							<tr>
+								<td>
+									<code class="xpath">self::label</code>
+								</td>
+								<td align="right"><p>79</p></td>
+								<td align="right"><p>2&nbsp;ms</p></td>
+								<td align="right"><p>1&nbsp;662</p></td>
+								<td align="right"><p>47&nbsp;ms</p></td>
+							</tr>
+							<tr>
+								<td>
+									<code class="xpath">self::label[parent::abstract]</code>
+								</td>
+								<td align="right"><p>79</p></td>
+								<td align="right"><p>3&nbsp;ms</p></td>
+								<td align="right"><p>1</p></td>
+								<td align="right"><p>(Too low to measure)</p></td>
+							</tr>
+							<tr>
+								<td>
+									<code class="xpath">self::label[parent::fn]</code>
+								</td>
+								<td align="right"><p>1&nbsp;733</p></td>
+								<td align="right"><p>60&nbsp;ms</p></td>
+								<td align="right"><p>1&nbsp;091</p></td>
+								<td align="right"><p>42&nbsp;ms</p></td>
+							</tr>
+							<tr>
+								<td>
+									<code class="xpath"
+										>self::named-content[@vocab="unit-category"]</code
+									>
+								</td>
+								<td align="right">2&nbsp;173</td>
+								<td align="right">160&nbsp;ms</td>
+								<td align="right">1&nbsp;174</td>
+								<td align="right">96&nbsp;ms</td>
+							</tr>
+							<tr>
+								<td>
+									<code class="xpath"
+										>self::named-content[@vocab="specification"]</code
+									>
+								</td>
+								<td align="right"><p>325</p></td>
+								<td align="right"><p>22&nbsp;ms</p></td>
+								<td align="right"><p>538</p></td>
+								<td align="right"><p>56&nbsp;ms</p></td>
+							</tr>
+						</table>
+
+						<aside class="notes">
+							<ul>
+								<li>Abstract case is so rare, it almost disappears</li>
+								<li>
+									the 'default' named-content without attrs is never used. Bayes
+									provides estimation of 'common' variants
+								</li>
 							</ul>
 						</aside>
 					</section>
 				</section>
-
+				<!-- VROT -->
 				<section>
 					<section>
 						<h2>Processing XML</h2>
@@ -204,8 +315,10 @@
 						<ul>
 							<li>Lazy evaluation</li>
 							<li>Outermost</li>
-							<li>Buckets</li>
+							<li>Buckets as cheap early fail</li>
 						</ul>
+						<pre><code class="xpath">descendant-or-self::li[1]</code></pre>
+						<pre><code class="xpath">descendant-or-self::li => outermost()</code></pre>
 					</section>
 
 					<section>
@@ -215,15 +328,41 @@
 							<li>Offline pre-processing</li>
 							<li>un-JavaScript-like optimizations</li>
 						</ul>
+						<aside class="notes">
+							<ul>
+								<li>Offline pre-process: remove unnecessary optionality, groups</li>
+								<li>These often exist due to XML Schema extension rules</li>
+								<li>Avoid memory allocations - all state in an ArrayBuffer</li>
+							</ul>
+						</aside>
 					</section>
 
 					<section>
 						<h2>Indices - DOM</h2>
-						<ul>
-							<li>Attribute index</li>
-							<li>Bucket index</li>
-							<li>Descendant index</li>
+						<ul style="min-width:90%">
+							<li>
+								Attribute index
+								<pre><code class="xpath">/descendant-or-self::*[@id=$value]</code></pre>
+							</li>
+							<li>
+								Bucket index<br />
+								<pre><code class="xpath">/descendant-or-self::fn</code></pre>
+							</li>
+							<li>
+								Descendant index<br />
+								<pre><code class="xpath">$node/descendant::li</code></pre>
+							</li>
 						</ul>
+						<aside class="notes">
+							<ul>
+								<li>Indices make lookups constant time</li>
+								<li>
+									Actively track nodes of interest instead of looking for them
+									later
+								</li>
+								<li>Update using DOM mutation records</li>
+							</ul>
+						</aside>
 					</section>
 
 					<section>
@@ -235,9 +374,16 @@
 						</ul>
 						<aside class="notes">
 							<ul>
+								<li>As presented in 2017 for Schematron</li>
 								<li>Mutation record type ~ dom access method</li>
-								<li>Dependency optimizations: filter functions, buckets</li>
-								<li>Current / future work: incremental computation</li>
+								<li>
+									Dependency optimizations: filter functions, buckets (e.g., child
+									li)
+								</li>
+								<li>
+									Current / future work: incremental computation through index
+									dependencies
+								</li>
 							</ul>
 						</aside>
 					</section>
@@ -267,14 +413,14 @@
 					</aside>
 				</section>
 
-				<section>
+				<section class="notes">
 					<h2>The end?</h2>
 					<ul>
 						<li>Many tricks possible</li>
 						<li>Browser-based XML processing can be fast</li>
 						<li>Lots more to do...</li>
 					</ul>
-					<aside>
+					<aside class="notes">
 						<ul>
 							<li>
 								There are lots of ways to make processing XML fast, also for
@@ -283,11 +429,12 @@
 							<li>Even in the browser, and without platform support</li>
 							<li>
 								We'll continue to improve indices as we further adopt XQUF - use for
-								operation states
+								operation states. Perhaps XQuery Tasks? @Debbie Lockett @Adam
+								Retter?
 							</li>
 							<li>
 								We're still looking for a good declarative format for our schema
-								experience configuration - CSS fits, but selectors are not XPath
+								experience configuration - CSS fits, but OUR selectors are XPath
 							</li>
 						</ul>
 					</aside>
